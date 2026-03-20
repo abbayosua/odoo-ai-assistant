@@ -22,6 +22,12 @@ Features:
 - Context-aware responses
 - Workflow automation with AI
 
+Architecture: Atomic Design Pattern
+- Atoms: Smallest UI components (buttons, icons, inputs)
+- Molecules: Combinations of atoms (chat messages, suggestions)
+- Organisms: Complex UI sections (chat widget, sidebar)
+- Templates: Page layouts
+
 Supported Odoo Versions: 16, 17, 18, 19
     """,
     'author': 'Abb Yosua',
@@ -46,11 +52,16 @@ Supported Odoo Versions: 16, 17, 18, 19
         ],
     },
     
-    # Data files
+    # Data files (loaded in order)
     'data': [
+        # Security
         'security/security.xml',
         'security/ir.model.access.csv',
+        
+        # Default data
         'data/default_prompts.xml',
+        
+        # Views
         'views/menu_views.xml',
         'views/ai_config_views.xml',
         'views/ai_chat_views.xml',
@@ -63,16 +74,61 @@ Supported Odoo Versions: 16, 17, 18, 19
         'data/demo_data.xml',
     ],
     
-    # Assets
+    # Assets - Atomic Design Structure
     'assets': {
         'web.assets_backend': [
-            'ai_assistant/static/src/js/ai_chat.js',
-            'ai_assistant/static/src/js/ai_autocomplete.js',
-            'ai_assistant/static/src/js/ai_sidebar.js',
+            # Utils
+            'ai_assistant/static/src/utils/helpers.js',
+            'ai_assistant/static/src/utils/hooks.js',
+            
+            # Services
+            'ai_assistant/static/src/services/ai_service.js',
+            
+            # Atoms - Layer 1
+            'ai_assistant/static/src/atoms/button.js',
+            'ai_assistant/static/src/atoms/icon.js',
+            'ai_assistant/static/src/atoms/badge.js',
+            'ai_assistant/static/src/atoms/spinner.js',
+            'ai_assistant/static/src/atoms/input.js',
+            'ai_assistant/static/src/atoms/avatar.js',
+            'ai_assistant/static/src/atoms/templates.xml',
+            'ai_assistant/static/src/atoms/atoms.css',
+            
+            # Molecules - Layer 2
+            'ai_assistant/static/src/molecules/chat_message.js',
+            'ai_assistant/static/src/molecules/chat_input.js',
+            'ai_assistant/static/src/molecules/suggestion_item.js',
+            'ai_assistant/static/src/molecules/typing_indicator.js',
+            'ai_assistant/static/src/molecules/conversation_header.js',
+            'ai_assistant/static/src/molecules/empty_state.js',
+            'ai_assistant/static/src/molecules/templates.xml',
+            'ai_assistant/static/src/molecules/molecules.css',
+            
+            # Organisms - Layer 3
+            'ai_assistant/static/src/organisms/chat_widget.js',
+            'ai_assistant/static/src/organisms/float_button.js',
+            'ai_assistant/static/src/organisms/autocomplete_dropdown.js',
+            'ai_assistant/static/src/organisms/sidebar.js',
+            'ai_assistant/static/src/organisms/templates.xml',
+            'ai_assistant/static/src/organisms/organisms.css',
+            
+            # Main entry point
+            'ai_assistant/static/src/main.js',
+            
+            # Legacy CSS (for backward compatibility)
             'ai_assistant/static/src/css/ai_assistant.css',
         ],
         'web.assets_frontend': [
-            'ai_assistant/static/src/js/ai_chat.js',
+            # Atoms
+            'ai_assistant/static/src/atoms/atoms.css',
+            
+            # Molecules
+            'ai_assistant/static/src/molecules/molecules.css',
+            
+            # Organisms
+            'ai_assistant/static/src/organisms/organisms.css',
+            
+            # Main
             'ai_assistant/static/src/css/ai_assistant.css',
         ],
     },

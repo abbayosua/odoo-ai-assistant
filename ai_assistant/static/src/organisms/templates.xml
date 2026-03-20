@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Organisms Templates - Atomic Design Layer 3
+  Complex, composed UI components
+-->
+<templates xml:space="preserve">
+
+    <!-- ============================================
+         CHAT WIDGET - Organism Component
+         ============================================ -->
+    <t t-name="ai_assistant.OrganismChatWidget" owl="1">
+        <div t-ref="container" t-att-class="widgetClass">
+            <!-- Header -->
+            <ConversationHeader 
+                title="'AI Assistant'"
+                subtitle="'Powered by AI'"
+                showClose="true"
+                showClear="state.messages.length > 0"
+                onClose="close"
+                onClear="clearConversation"/>
+            
+            <!-- Messages area -->
+            <div t-ref="messages" class="ai-chat-widget__messages">
+                <!-- Empty state -->
+                <EmptyState 
+                    t-if="isEmpty"
+                    title="'Start a conversation'"
+                    description="'Ask me anything! I can help with questions, content generation, translations, and more.'"
+                    suggestions="['How can I create a new invoice?', 'Help me write an email', 'Generate a product description']"
+                    onSuggestionClick="handleSuggestionClick"/>
+                
+                <!-- Messages -->
+                <template t-else="">
+                    <ChatMessage 
+                        t-foreach="state.messages" 
+                        t-as="message"
+                        t-key="message.id"
+                        message="message"
+                        showAvatar="true"
+                        onCopy="handleCopy"
+                        onRegenerate="regenerate"
+                        onFeedback="handleFeedback"/>
+                    
+                    <!-- Typing indicator -->
+                    <TypingIndicator t-if="state.isLoading"/>
+                </template>
+            </div>
+            
+            <!-- Input area -->
+            <div class="ai-chat-widget__input">
+                <ChatInput 
+                    placeholder="'Type your message...'"
+                    disabled="false"
+                    loading="state.isLoading"
+                    onSend="sendMessage"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         FLOAT BUTTON - Organism Component
+         ============================================ -->
+    <t t-name="ai_assistant.OrganismFloatButton" owl="1">
+        <button 
+            t-att-class="buttonClass"
+            t-att-title="props.tooltip"
+            t-on-click="handleClick"
+            t-on-mouseenter="handleMouseEnter"
+            t-on-mouseleave="handleMouseLeave"
+            t-on-mousedown="handleMouseDown"
+            t-on-mouseup="handleMouseUp">
+            
+            <AIIcon name="props.icon" size="lg" color="white"/>
+            
+            <!-- Badge for unread count -->
+            <AIBadge 
+                t-if="props.badge and props.badge > 0"
+                variant="danger"
+                size="sm"
+                pill="true"
+                class="ai-float-button__badge">
+                <t t-esc="props.badge > 99 ? '99+' : props.badge"/>
+            </AIBadge>
+        </button>
+    </t>
+
+    <!-- ============================================
+         AUTOCOMPLETE DROPDOWN - Organism Component
+         ============================================ -->
+    <t t-name="ai_assistant.OrganismAutocompleteDropdown" owl="1">
+        <div 
+            t-ref="dropdown"
+            t-if="props.suggestions.length > 0 or props.loading"
+            class="ai-autocomplete-dropdown"
+            t-att-style="dropdownStyle"
+            role="listbox">
+            
+            <!-- Loading state -->
+            <div t-if="props.loading" class="ai-autocomplete-dropdown__loading">
+                <AISpinner size="sm"/>
+                <span>Loading suggestions...</span>
+            </div>
+            
+            <!-- Suggestions -->
+            <template t-else="">
+                <SuggestionItem 
+                    t-foreach="props.suggestions" 
+                    t-as="suggestion"
+                    t-key="suggestion_index"
+                    suggestion="suggestion"
+                    index="suggestion_index"
+                    selected="suggestion_index === props.selectedIndex"
+                    onSelect="handleSelect"/>
+            </template>
+        </div>
+    </t>
+
+    <!-- ============================================
+         AI SIDEBAR - Organism Component
+         ============================================ -->
+    <t t-name="ai_assistant.OrganismSidebar" owl="1">
+        <div t-att-class="sidebarClass">
+            <!-- Sidebar header -->
+            <div class="ai-sidebar__header">
+                <div class="ai-sidebar__title">
+                    <AIIcon name="robot" size="md" color="primary"/>
+                    <span>AI Assistant</span>
+                </div>
+                <button class="ai-sidebar__close" t-on-click="handleToggle">
+                    <AIIcon name="times" size="sm"/>
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="ai-sidebar__tabs">
+                <button 
+                    t-att-class="'ai-sidebar__tab' + (state.activeTab === 'chat' ? ' ai-sidebar__tab--active' : '')"
+                    t-on-click="() => setActiveTab('chat')">
+                    <AIIcon name="comments" size="sm"/>
+                    Chat
+                </button>
+                <button 
+                    t-att-class="'ai-sidebar__tab' + (state.activeTab === 'templates' ? ' ai-sidebar__tab--active' : '')"
+                    t-on-click="() => setActiveTab('templates')">
+                    <AIIcon name="magic" size="sm"/>
+                    Templates
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="ai-sidebar__content">
+                <!-- Chat tab -->
+                <div t-if="state.activeTab === 'chat'" class="ai-sidebar__chat">
+                    <!-- Context info -->
+                    <div t-if="props.model and props.recordName" class="ai-sidebar__context">
+                        <span class="ai-sidebar__context-label">Working with:</span>
+                        <span class="ai-sidebar__context-value" t-esc="props.recordName"/>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div class="ai-sidebar__messages">
+                        <EmptyState 
+                            t-if="state.messages.length === 0 and !state.isLoading"
+                            title="'AI Assistant'"
+                            description="'I can help you with content generation, translations, and more.'"
+                            suggestions="modelSuggestions"
+                            onSuggestionClick="sendMessage"/>
+                        
+                        <template t-else="">
+                            <ChatMessage 
+                                t-foreach="state.messages" 
+                                t-as="message"
+                                t-key="message.id"
+                                message="message"
+                                showAvatar="false"
+                                onCopy="() => {}"/>
+                            
+                            <TypingIndicator t-if="state.isLoading"/>
+                        </template>
+                    </div>
+                    
+                    <!-- Input -->
+                    <div class="ai-sidebar__input">
+                        <ChatInput 
+                            placeholder="'Ask me anything...'"
+                            loading="state.isLoading"
+                            onSend="sendMessage"/>
+                    </div>
+                </div>
+                
+                <!-- Templates tab -->
+                <div t-if="state.activeTab === 'templates'" class="ai-sidebar__templates">
+                    <div class="ai-sidebar__templates-grid">
+                        <button 
+                            t-foreach="state.templates" 
+                            t-as="template"
+                            t-key="template.id"
+                            class="ai-sidebar__template-card"
+                            t-on-click="() => useTemplate(template.code)">
+                            <AIIcon name="magic" size="sm" color="primary"/>
+                            <span t-esc="template.name"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
