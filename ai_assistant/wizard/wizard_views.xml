@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo>
+    <!-- AI Generate Wizard -->
+    <record id="view_ai_generate_wizard_form" model="ir.ui.view">
+        <field name="name">ai.assistant.generate.wizard.form</field>
+        <field name="model">ai.assistant.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="AI Content Generator">
+                <header invisible="1">
+                    <field name="state" widget="statusbar" statusbar_visible="input,output"/>
+                </header>
+                <sheet>
+                    <group states="input">
+                        <group string="Settings">
+                            <field name="template_id" widget="selection"/>
+                            <field name="prompt" placeholder="Enter your prompt or select a template above..."/>
+                        </group>
+                        <group string="Context">
+                            <field name="context" placeholder="Additional context for the AI (optional)"/>
+                        </group>
+                    </group>
+                    <group states="output" string="Generated Content">
+                        <field name="generated_content" widget="text"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate" string="Generate" type="object" class="btn-primary" states="input" icon="fa-magic"/>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary" states="output" icon="fa-check"/>
+                    <button name="action_regenerate" string="Regenerate" type="object" states="output" icon="fa-refresh"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_ai_generate_wizard" model="ir.actions.act_window">
+        <field name="name">AI Content Generator</field>
+        <field name="res_model">ai.assistant.generate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    
+    <!-- AI Import Wizard -->
+    <record id="view_ai_import_wizard_form" model="ir.ui.view">
+        <field name="name">ai.assistant.import.wizard.form</field>
+        <field name="model">ai.assistant.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="AI Document Import">
+                <header invisible="1">
+                    <field name="state" widget="statusbar" statusbar_visible="upload,preview,done"/>
+                </header>
+                <sheet>
+                    <group states="upload" string="Upload Document">
+                        <field name="file" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                        <field name="document_type"/>
+                        <field name="target_model"/>
+                    </group>
+                    <group states="preview" string="Extracted Data">
+                        <field name="extracted_text" readonly="1"/>
+                        <field name="preview_html" widget="html"/>
+                    </group>
+                    <group states="done" string="Import Complete">
+                        <div class="alert alert-success" role="alert">
+                            <strong>Success!</strong> Your document has been imported as a new record.
+                        </div>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_process" string="Process Document" type="object" class="btn-primary" states="upload" icon="fa-cogs"/>
+                    <button name="action_import" string="Import as Record" type="object" class="btn-primary" states="preview" icon="fa-download"/>
+                    <button name="action_new_document" string="Process Another" type="object" states="done" icon="fa-plus"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_ai_import_wizard" model="ir.actions.act_window">
+        <field name="name">AI Document Import</field>
+        <field name="res_model">ai.assistant.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

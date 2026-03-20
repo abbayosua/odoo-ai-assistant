@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo noupdate="1">
+    <!-- Default Prompt Templates -->
+    
+    <record id="template_email_professional" model="ai.assistant.template">
+        <field name="name">Professional Email</field>
+        <field name="code">email_professional</field>
+        <field name="category">email</field>
+        <field name="prompt">Write a professional email with the following details:
+Topic: {topic}
+Recipient: {recipient}
+Key points: {key_points}
+Tone: Professional and courteous
+
+Please write a complete email with subject line and body.</field>
+        <field name="system_prompt">You are a professional business communication assistant. Write clear, effective emails.</field>
+        <field name="is_default" eval="True"/>
+    </record>
+    
+    <record id="template_email_follow_up" model="ai.assistant.template">
+        <field name="name">Follow-up Email</field>
+        <field name="code">email_follow_up</field>
+        <field name="category">email</field>
+        <field name="prompt">Write a follow-up email about:
+Subject: {subject}
+Days since last contact: {days}
+Additional context: {context}
+
+Write a polite but effective follow-up email.</field>
+        <field name="system_prompt">You are a professional business communication assistant specializing in follow-up emails.</field>
+    </record>
+    
+    <record id="template_product_description" model="ai.assistant.template">
+        <field name="name">Product Description</field>
+        <field name="code">product_description</field>
+        <field name="category">description</field>
+        <field name="prompt">Generate a compelling product description for:
+Product Name: {name}
+Category: {category}
+Key Features: {features}
+Target Audience: {audience}
+
+Create a description that highlights benefits and features.</field>
+        <field name="system_prompt">You are a marketing copywriter specializing in product descriptions.</field>
+        <field name="is_default" eval="True"/>
+    </record>
+    
+    <record id="template_translate_en" model="ai.assistant.template">
+        <field name="name">Translate to English</field>
+        <field name="code">translate_en</field>
+        <field name="category">translation</field>
+        <field name="prompt">Translate the following text to English:
+
+{text}</field>
+        <field name="system_prompt">You are a professional translator. Translate accurately while preserving meaning and tone.</field>
+        <field name="is_default" eval="True"/>
+    </record>
+    
+    <record id="template_summarize" model="ai.assistant.template">
+        <field name="name">Summarize Text</field>
+        <field name="code">summarize</field>
+        <field name="category">summary</field>
+        <field name="prompt">Summarize the following text in a concise manner. Keep the key points and main message.
+
+Text:
+{text}</field>
+        <field name="system_prompt">You are a summarization assistant. Create clear, concise summaries that capture the essential information.</field>
+        <field name="is_default" eval="True"/>
+    </record>
+    
+    <record id="template_sentiment" model="ai.assistant.template">
+        <field name="name">Analyze Sentiment</field>
+        <field name="code">sentiment_analysis</field>
+        <field name="category">analysis</field>
+        <field name="prompt">Analyze the sentiment of the following text.
+
+Respond in JSON format:
+{
+  "sentiment": "positive/negative/neutral",
+  "confidence": 0.0-1.0,
+  "key_emotions": ["emotion1", "emotion2"],
+  "explanation": "brief explanation"
+}
+
+Text:
+{text}</field>
+        <field name="system_prompt">You are a sentiment analysis expert. Analyze text and provide accurate sentiment assessments.</field>
+        <field name="output_type">json</field>
+    </record>
+    
+    <record id="template_lead_qualification" model="ai.assistant.template">
+        <field name="name">Lead Qualification</field>
+        <field name="code">lead_qualification</field>
+        <field name="category">analysis</field>
+        <field name="prompt">Analyze this lead and provide a qualification assessment:
+
+Lead Name: {name}
+Company: {company}
+Email: {email}
+Notes: {notes}
+
+Provide:
+1. Lead Score (1-10)
+2. Recommended Next Steps
+3. Potential Objections
+4. Suggested Approach</field>
+        <field name="system_prompt">You are a sales expert specializing in lead qualification and B2B sales processes.</field>
+        <field name="model_ids" eval="[(4, ref('crm.model_crm_lead'))]"/>
+    </record>
+    
+    <record id="template_task_breakdown" model="ai.assistant.template">
+        <field name="name">Task Breakdown</field>
+        <field name="code">task_breakdown</field>
+        <field name="category">analysis</field>
+        <field name="prompt">Break down this task into smaller, actionable subtasks:
+
+Task: {task_name}
+Description: {description}
+Deadline: {deadline}
+
+Create a list of subtasks with estimated time and priority.</field>
+        <field name="system_prompt">You are a project management expert. Create clear, actionable task breakdowns.</field>
+        <field name="model_ids" eval="[(4, ref('project.model_project_task'))]"/>
+    </record>
+</odoo>

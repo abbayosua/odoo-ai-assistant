@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo noupdate="0">
+    <!-- Demo AI Provider (Ollama Local - for testing) -->
+    <record id="demo_provider_ollama" model="ai.assistant.provider">
+        <field name="name">Demo Ollama (Local)</field>
+        <field name="provider_type">ollama</field>
+        <field name="base_url">http://localhost:11434</field>
+        <field name="model">llama3.2</field>
+        <field name="temperature">0.7</field>
+        <field name="max_tokens">2000</field>
+        <field name="is_default" eval="True"/>
+    </record>
+    
+    <!-- Demo Conversation -->
+    <record id="demo_conversation_1" model="ai.assistant.conversation">
+        <field name="title">Getting Started with AI Assistant</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+    
+    <!-- Demo Messages -->
+    <record id="demo_message_1" model="ai.assistant.message">
+        <field name="conversation_id" ref="demo_conversation_1"/>
+        <field name="role">user</field>
+        <field name="content">Hello! Can you help me understand what this AI Assistant can do?</field>
+    </record>
+    
+    <record id="demo_message_2" model="ai.assistant.message">
+        <field name="conversation_id" ref="demo_conversation_1"/>
+        <field name="role">assistant</field>
+        <field name="content">Hello! I'm your AI Assistant integrated with Odoo. Here's what I can help you with:
+
+1. **Answer Questions**: Ask me anything about your business data or Odoo features
+2. **Generate Content**: I can help write emails, product descriptions, reports, and more
+3. **Document Processing**: Upload documents and I'll extract the data for you
+4. **Translations**: I can translate text between multiple languages
+5. **Summaries**: I can summarize long documents or conversations
+
+Just type your question or request, and I'll do my best to help!</field>
+    </record>
+    
+    <!-- Demo Document -->
+    <record id="demo_document_1" model="ai.assistant.document">
+        <field name="filename">sample_invoice.pdf</field>
+        <field name="document_type">invoice</field>
+        <field name="target_model">account.move</field>
+        <field name="state">draft</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+</odoo>

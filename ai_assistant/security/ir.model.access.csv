@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ai_provider_user,ai.assistant.provider.user,model_ai_assistant_provider,group_ai_user,1,0,0,0
+access_ai_provider_admin,ai.assistant.provider.admin,model_ai_assistant_provider,group_ai_admin,1,1,1,1
+access_ai_conversation_user,ai.assistant.conversation.user,model_ai_assistant_conversation,group_ai_user,1,1,1,1
+access_ai_message_user,ai.assistant.message.user,model_ai_assistant_message,group_ai_user,1,1,1,1
+access_ai_document_user,ai.assistant.document.user,model_ai_assistant_document,group_ai_document,1,1,1,1
+access_ai_template_user,ai.assistant.template.user,model_ai_assistant_template,group_ai_user,1,0,0,0
+access_ai_template_admin,ai.assistant.template.admin,model_ai_assistant_template,group_ai_admin,1,1,1,1

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_ai_assistant_root"
+              name="AI Assistant"
+              web_icon="ai_assistant,static/description/icon.png"
+              sequence="100"/>
+    
+    <!-- Dashboard -->
+    <menuitem id="menu_ai_dashboard"
+              name="Dashboard"
+              parent="menu_ai_assistant_root"
+              sequence="10"/>
+    
+    <!-- Conversations -->
+    <menuitem id="menu_ai_conversations"
+              name="Conversations"
+              parent="menu_ai_assistant_root"
+              action="action_ai_conversation"
+              sequence="20"/>
+    
+    <!-- Documents -->
+    <menuitem id="menu_ai_documents"
+              name="Documents"
+              parent="menu_ai_assistant_root"
+              action="action_ai_document"
+              sequence="30"/>
+    
+    <!-- Templates -->
+    <menuitem id="menu_ai_templates"
+              name="Templates"
+              parent="menu_ai_assistant_root"
+              action="action_ai_template"
+              sequence="40"/>
+    
+    <!-- Configuration -->
+    <menuitem id="menu_ai_config"
+              name="Configuration"
+              parent="menu_ai_assistant_root"
+              sequence="100"/>
+    
+    <menuitem id="menu_ai_providers"
+              name="AI Providers"
+              parent="menu_ai_config"
+              action="action_ai_provider"
+              sequence="10"/>
+    
+    <menuitem id="menu_ai_template_config"
+              name="Prompt Templates"
+              parent="menu_ai_config"
+              action="action_ai_template"
+              sequence="20"/>
+</odoo>

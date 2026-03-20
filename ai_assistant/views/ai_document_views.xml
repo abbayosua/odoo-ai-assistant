@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo>
+    <!-- AI Document Views -->
+    <record id="view_ai_document_tree" model="ir.ui.view">
+        <field name="name">ai.assistant.document.tree</field>
+        <field name="model">ai.assistant.document</field>
+        <field name="arch" type="xml">
+            <tree string="Documents" decoration-success="state == 'imported'" decoration-warning="state == 'extracted'" decoration-danger="state == 'error'">
+                <field name="filename"/>
+                <field name="document_type"/>
+                <field name="target_model"/>
+                <field name="state" widget="badge" decoration-success="state == 'imported'" decoration-warning="state == 'extracted'" decoration-info="state == 'processing'" decoration-danger="state == 'error'"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_ai_document_form" model="ir.ui.view">
+        <field name="name">ai.assistant.document.form</field>
+        <field name="model">ai.assistant.document</field>
+        <field name="arch" type="xml">
+            <form string="Document">
+                <header>
+                    <button name="action_process" string="Process Document" type="object" class="btn-primary" icon="fa-cogs" attrs="{'invisible': [('state', 'not in', ['draft', 'error'])]}"/>
+                    <button name="action_import" string="Import as Record" type="object" class="btn-success" icon="fa-download" attrs="{'invisible': [('state', '!=', 'extracted')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,extracted,imported"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="filename"/></h1>
+                    </div>
+                    <group>
+                        <group string="Document">
+                            <field name="file" filename="filename"/>
+                            <field name="mimetype"/>
+                            <field name="document_type"/>
+                        </group>
+                        <group string="Import Settings">
+                            <field name="target_model" widget="selection"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Extracted Text" attrs="{'invisible': [('extracted_text', '=', False)]}">
+                            <field name="extracted_text" readonly="1"/>
+                        </page>
+                        <page string="Extracted Data" attrs="{'invisible': [('extracted_data', '=', False)]}">
+                            <field name="extracted_data" widget="json"/>
+                        </page>
+                        <page string="Error Details" attrs="{'invisible': [('error_message', '=', False)]}">
+                            <field name="error_message"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_ai_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">ai.assistant.document</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_user_id': uid}</field>
+    </record>
+</odoo>

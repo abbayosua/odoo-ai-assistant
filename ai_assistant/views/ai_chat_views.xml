@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo>
+    <!-- AI Conversation Views -->
+    <record id="view_ai_conversation_tree" model="ir.ui.view">
+        <field name="name">ai.assistant.conversation.tree</field>
+        <field name="model">ai.assistant.conversation</field>
+        <field name="arch" type="xml">
+            <tree string="Conversations" decoration-muted="is_archived == True">
+                <field name="title"/>
+                <field name="create_date"/>
+                <field name="message_count"/>
+                <field name="is_archived"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_ai_conversation_form" model="ir.ui.view">
+        <field name="name">ai.assistant.conversation.form</field>
+        <field name="model">ai.assistant.conversation</field>
+        <field name="arch" type="xml">
+            <form string="Conversation">
+                <header>
+                    <button name="action_archive" string="Archive" type="object" attrs="{'invisible': [('is_archived', '=', True)]}"/>
+                    <button name="action_unarchive" string="Unarchive" type="object" attrs="{'invisible': [('is_archived', '=', False)]}"/>
+                    <button name="action_clear_history" string="Clear History" type="object" confirm="Are you sure you want to clear all messages?"/>
+                    <field name="is_archived" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="provider_id"/>
+                        </group>
+                        <group>
+                            <field name="context_model"/>
+                            <field name="context_res_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Messages">
+                            <field name="message_ids" mode="kanban">
+                                <kanban default_group_by="role" class="o_kanban_mobile">
+                                    <field name="role"/>
+                                    <field name="content"/>
+                                    <field name="create_date"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                                <div class="o_kanban_record_top mb4">
+                                                    <strong><field name="role"/></strong>
+                                                    <small class="text-muted"><field name="create_date"/></small>
+                                                </div>
+                                                <div class="o_kanban_record_body">
+                                                    <field name="content" widget="text"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                                <form>
+                                    <group>
+                                        <field name="role"/>
+                                        <field name="content"/>
+                                        <field name="create_date"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_ai_conversation" model="ir.actions.act_window">
+        <field name="name">Conversations</field>
+        <field name="res_model">ai.assistant.conversation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_archived', '=', False)]</field>
+        <field name="context">{'search_default_user_id': uid}</field>
+    </record>
+</odoo>

@@ -1,0 +1,50 @@
+# Security groups for AI Assistant
+# Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details.
+
+<odoo>
+    <!-- AI Assistant User Group -->
+    <record id="group_ai_user" model="res.groups">
+        <field name="name">AI Assistant: User</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Basic access to AI Assistant chat and autocomplete features</field>
+    </record>
+    
+    <!-- AI Assistant Document Processing -->
+    <record id="group_ai_document" model="res.groups">
+        <field name="name">AI Assistant: Document Processing</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="implied_ids" eval="[(4, ref('group_ai_user'))]"/>
+        <field name="comment">Access to document processing features</field>
+    </record>
+    
+    <!-- AI Assistant Administrator -->
+    <record id="group_ai_admin" model="res.groups">
+        <field name="name">AI Assistant: Administrator</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="implied_ids" eval="[(4, ref('group_ai_document'))]"/>
+        <field name="comment">Full access to AI Assistant configuration and all features</field>
+    </record>
+    
+    <!-- Multi-company rules -->
+    <record id="rule_ai_conversation_user" model="ir.rule">
+        <field name="name">AI Conversation: User's own records</field>
+        <field name="model_id" ref="model_ai_assistant_conversation"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ai_user'))]"/>
+    </record>
+    
+    <record id="rule_ai_document_user" model="ir.rule">
+        <field name="name">AI Document: User's own records</field>
+        <field name="model_id" ref="model_ai_assistant_document"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_ai_user'))]"/>
+    </record>
+    
+    <!-- Admin sees all -->
+    <record id="rule_ai_conversation_admin" model="ir.rule">
+        <field name="name">AI Conversation: Admin sees all</field>
+        <field name="model_id" ref="model_ai_assistant_conversation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_ai_admin'))]"/>
+    </record>
+</odoo>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
+<odoo>
+    <!-- Settings View -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">AI Assistant Settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="AI Assistant" string="AI Assistant" data-key="ai_assistant">
+                    <h2>AI Assistant Configuration</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_enabled"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_enabled"/>
+                                <div class="text-muted">
+                                    Enable or disable all AI Assistant features
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_provider_id"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_provider_id"/>
+                                <div class="text-muted">
+                                    Select the default AI provider for all operations
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="mt16">Feature Settings</h3>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_chat_enabled" attrs="{'invisible': [('ai_enabled', '=', False)]}"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_chat_enabled"/>
+                                <div class="text-muted">
+                                    Enable the AI chat interface widget
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_autocomplete_enabled" attrs="{'invisible': [('ai_enabled', '=', False)]}"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_autocomplete_enabled"/>
+                                <div class="text-muted">
+                                    Enable AI-powered field autocomplete
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_document_enabled" attrs="{'invisible': [('ai_enabled', '=', False)]}"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_document_enabled"/>
+                                <div class="text-muted">
+                                    Enable document processing and OCR features
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_email_enabled" attrs="{'invisible': [('ai_enabled', '=', False)]}"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_email_enabled"/>
+                                <div class="text-muted">
+                                    Enable AI email composition assistant
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="mt16">Data Retention</h3>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="ai_history_days"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="ai_history_days"/>
+                                <div class="text-muted">
+                                    Number of days to keep conversation history (0 = keep forever)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="action_ai_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'ai_assistant'}</field>
+    </record>
+    
+    <menuitem id="menu_ai_settings"
+              name="Settings"
+              parent="menu_ai_config"
+              action="action_ai_settings"
+              sequence="100"/>
+</odoo>
