@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Templates - Atomic Design Layer 4
+  Page layouts that combine organisms
+  
+  These templates represent complete views/pages
+-->
+<templates xml:space="preserve">
+
+    <!-- ============================================
+         CHAT PAGE - Template
+         Full-page chat interface
+         ============================================ -->
+    <t t-name="ai_assistant.TemplateChatPage" owl="1">
+        <div class="ai-page ai-page--chat">
+            <!-- Sidebar (optional) -->
+            <aside t-if="props.showSidebar" class="ai-page__sidebar">
+                <AIChatSidebar 
+                    templates="state.templates"
+                    conversations="state.conversations"
+                    onConversationSelect="handleConversationSelect"
+                    onNewChat="handleNewChat"/>
+            </aside>
+            
+            <!-- Main chat area -->
+            <main class="ai-page__main">
+                <ChatWidget 
+                    ref="chatWidget"
+                    isOpen="true"
+                    position="'embedded'"
+                    context="props.context"
+                    onClose="handleClose"/>
+            </main>
+        </div>
+    </t>
+
+    <!-- ============================================
+         ASSISTANT PANEL - Template
+         Panel for embedding in Odoo forms
+         ============================================ -->
+    <t t-name="ai_assistant.TemplateAssistantPanel" owl="1">
+        <div class="ai-panel">
+            <!-- Panel header -->
+            <div class="ai-panel__header">
+                <div class="ai-panel__title">
+                    <AIIcon name="robot" size="md" color="primary"/>
+                    <span>AI Assistant</span>
+                </div>
+                <div class="ai-panel__actions">
+                    <button 
+                        class="ai-panel__action"
+                        t-on-click="handleSettings"
+                        title="Settings">
+                        <AIIcon name="cog" size="sm"/>
+                    </button>
+                    <button 
+                        class="ai-panel__action"
+                        t-on-click="handleMaximize"
+                        title="Maximize">
+                        <AIIcon name="expand" size="sm"/>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Context banner -->
+            <div t-if="props.model and props.recordName" class="ai-panel__context">
+                <div class="ai-panel__context-icon">
+                    <AIIcon name="info-circle" size="sm"/>
+                </div>
+                <div class="ai-panel__context-info">
+                    <span class="ai-panel__context-label">Working with:</span>
+                    <span class="ai-panel__context-value" t-esc="props.recordName"/>
+                </div>
+            </div>
+            
+            <!-- Panel content -->
+            <div class="ai-panel__content">
+                <!-- Quick actions -->
+                <div class="ai-panel__quick-actions">
+                    <button 
+                        t-foreach="getQuickActions()" 
+                        t-as="action"
+                        t-key="action.id"
+                        class="ai-panel__quick-action"
+                        t-on-click="() => handleQuickAction(action)">
+                        <AIIcon name="action.icon" size="sm"/>
+                        <span t-esc="action.label"/>
+                    </button>
+                </div>
+                
+                <!-- Chat area -->
+                <div class="ai-panel__chat">
+                    <ChatMessage 
+                        t-foreach="state.messages" 
+                        t-as="message"
+                        t-key="message.id"
+                        message="message"
+                        showAvatar="false"/>
+                    
+                    <TypingIndicator t-if="state.isLoading"/>
+                </div>
+            </div>
+            
+            <!-- Input area -->
+            <div class="ai-panel__input">
+                <ChatInput 
+                    placeholder="'Ask about this record...'"
+                    loading="state.isLoading"
+                    onSend="sendMessage"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         SIDEBAR CONVERSATION LIST - Template
+         List of conversations in sidebar
+         ============================================ -->
+    <t t-name="ai_assistant.TemplateConversationList" owl="1">
+        <div class="ai-conversation-list">
+            <!-- Search -->
+            <div class="ai-conversation-list__search">
+                <AIInput 
+                    type="text"
+                    placeholder="'Search conversations...'"
+                    icon="'search'"
+                    value="state.searchQuery"
+                    onInput="handleSearch"/>
+            </div>
+            
+            <!-- New chat button -->
+            <button class="ai-conversation-list__new" t-on-click="handleNewChat">
+                <AIIcon name="plus" size="sm"/>
+                <span>New Conversation</span>
+            </button>
+            
+            <!-- Conversation list -->
+            <div class="ai-conversation-list__items">
+                <div 
+                    t-foreach="filteredConversations" 
+                    t-as="conversation"
+                    t-key="conversation.id"
+                    t-att-class="'ai-conversation-list__item' + (conversation.id === state.activeId ? ' ai-conversation-list__item--active' : '')"
+                    t-on-click="() => handleSelect(conversation)">
+                    
+                    <div class="ai-conversation-list__item-title" t-esc="conversation.title"/>
+                    <div class="ai-conversation-list__item-preview" t-esc="conversation.preview"/>
+                    <div class="ai-conversation-list__item-time" t-esc="formatTime(conversation.timestamp)"/>
+                </div>
+                
+                <!-- Empty state -->
+                <div t-if="filteredConversations.length === 0" class="ai-conversation-list__empty">
+                    <AIIcon name="comments" size="lg" color="muted"/>
+                    <p>No conversations yet</p>
+                    <button class="ai-conversation-list__empty-action" t-on-click="handleNewChat">
+                        Start a new conversation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         SETTINGS PANEL - Template
+         AI Assistant settings
+         ============================================ -->
+    <t t-name="ai_assistant.TemplateSettingsPanel" owl="1">
+        <div class="ai-settings">
+            <!-- Provider settings -->
+            <section class="ai-settings__section">
+                <h3 class="ai-settings__section-title">
+                    <AIIcon name="plug" size="sm"/>
+                    AI Provider
+                </h3>
+                
+                <div class="ai-settings__field">
+                    <label>Provider</label>
+                    <select t-model="state.providerType" class="ai-settings__select">
+                        <option value="openai">OpenAI (GPT)</option>
+                        <option value="ollama">Ollama (Local)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                    </select>
+                </div>
+                
+                <div t-if="state.providerType === 'openai'" class="ai-settings__field">
+                    <label>API Key</label>
+                    <AIInput 
+                        type="'password'"
+                        placeholder="'sk-...'"
+                        value="state.apiKey"
+                        onInput="(v) => state.apiKey = v"/>
+                </div>
+                
+                <div t-if="state.providerType === 'ollama'" class="ai-settings__field">
+                    <label>Server URL</label>
+                    <AIInput 
+                        type="'text'"
+                        placeholder="'http://localhost:11434'"
+                        value="state.baseUrl"
+                        onInput="(v) => state.baseUrl = v"/>
+                </div>
+                
+                <div class="ai-settings__field">
+                    <label>Model</label>
+                    <select t-model="state.model" class="ai-settings__select">
+                        <option t-if="state.providerType === 'openai'" value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option t-if="state.providerType === 'openai'" value="gpt-4o">GPT-4o</option>
+                        <option t-if="state.providerType === 'ollama'" value="llama3.2">Llama 3.2</option>
+                        <option t-if="state.providerType === 'ollama'" value="mistral">Mistral</option>
+                        <option t-if="state.providerType === 'anthropic'" value="claude-3-haiku">Claude 3 Haiku</option>
+                        <option t-if="state.providerType === 'anthropic'" value="claude-3-sonnet">Claude 3 Sonnet</option>
+                    </select>
+                </div>
+            </section>
+            
+            <!-- Behavior settings -->
+            <section class="ai-settings__section">
+                <h3 class="ai-settings__section-title">
+                    <AIIcon name="sliders" size="sm"/>
+                    Behavior
+                </h3>
+                
+                <div class="ai-settings__field">
+                    <label>Temperature: <t t-esc="state.temperature"/></label>
+                    <input 
+                        type="range" 
+                        min="0" 
+                        max="1" 
+                        step="0.1"
+                        t-model="state.temperature"
+                        class="ai-settings__slider"/>
+                    <div class="ai-settings__slider-labels">
+                        <span>Precise</span>
+                        <span>Creative</span>
+                    </div>
+                </div>
+                
+                <div class="ai-settings__field">
+                    <label>Max Response Length</label>
+                    <select t-model="state.maxTokens" class="ai-settings__select">
+                        <option value="500">Short (~100 words)</option>
+                        <option value="1000">Medium (~200 words)</option>
+                        <option value="2000">Long (~400 words)</option>
+                    </select>
+                </div>
+            </section>
+            
+            <!-- Actions -->
+            <div class="ai-settings__actions">
+                <AIButton variant="secondary" on-click="handleTest">
+                    Test Connection
+                </AIButton>
+                <AIButton variant="primary" on-click="handleSave">
+                    Save Settings
+                </AIButton>
+            </div>
+        </div>
+    </t>
+
+</templates>
