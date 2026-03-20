@@ -1,0 +1,487 @@
+/**
+ * AI Assistant - Atoms Styles
+ * Atomic Design Layer 1 - Smallest UI Components
+ */
+
+/* ============================================
+   CSS Variables / Design Tokens
+   ============================================ */
+:root {
+    /* Colors - Primary */
+    --ai-color-primary: #7c3aed;
+    --ai-color-primary-light: #a78bfa;
+    --ai-color-primary-dark: #5b21b6;
+    --ai-color-primary-50: rgba(124, 58, 237, 0.05);
+    --ai-color-primary-100: rgba(124, 58, 237, 0.1);
+    
+    /* Colors - Semantic */
+    --ai-color-success: #10b981;
+    --ai-color-warning: #f59e0b;
+    --ai-color-danger: #ef4444;
+    --ai-color-info: #3b82f6;
+    
+    /* Colors - Neutral */
+    --ai-color-white: #ffffff;
+    --ai-color-gray-50: #f8fafc;
+    --ai-color-gray-100: #f1f5f9;
+    --ai-color-gray-200: #e2e8f0;
+    --ai-color-gray-300: #cbd5e1;
+    --ai-color-gray-400: #94a3b8;
+    --ai-color-gray-500: #64748b;
+    --ai-color-gray-600: #475569;
+    --ai-color-gray-700: #334155;
+    --ai-color-gray-800: #1e293b;
+    --ai-color-gray-900: #0f172a;
+    
+    /* Typography */
+    --ai-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --ai-font-size-xs: 0.75rem;
+    --ai-font-size-sm: 0.875rem;
+    --ai-font-size-md: 1rem;
+    --ai-font-size-lg: 1.125rem;
+    --ai-font-size-xl: 1.25rem;
+    
+    /* Spacing */
+    --ai-spacing-xs: 0.25rem;
+    --ai-spacing-sm: 0.5rem;
+    --ai-spacing-md: 1rem;
+    --ai-spacing-lg: 1.5rem;
+    --ai-spacing-xl: 2rem;
+    
+    /* Border Radius */
+    --ai-radius-sm: 4px;
+    --ai-radius-md: 8px;
+    --ai-radius-lg: 12px;
+    --ai-radius-full: 9999px;
+    
+    /* Shadows */
+    --ai-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --ai-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --ai-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --ai-transition-fast: 0.15s ease;
+    --ai-transition-normal: 0.25s ease;
+    --ai-transition-slow: 0.35s ease;
+}
+
+/* ============================================
+   AI BUTTON - Atomic Component
+   ============================================ */
+.ai-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ai-spacing-sm);
+    border: none;
+    cursor: pointer;
+    font-family: var(--ai-font-family);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--ai-transition-fast);
+    white-space: nowrap;
+}
+
+/* Button Sizes */
+.ai-btn--sm {
+    padding: var(--ai-spacing-xs) var(--ai-spacing-sm);
+    font-size: var(--ai-font-size-xs);
+    border-radius: var(--ai-radius-sm);
+}
+
+.ai-btn--md {
+    padding: var(--ai-spacing-sm) var(--ai-spacing-md);
+    font-size: var(--ai-font-size-sm);
+    border-radius: var(--ai-radius-md);
+}
+
+.ai-btn--lg {
+    padding: var(--ai-spacing-md) var(--ai-spacing-lg);
+    font-size: var(--ai-font-size-md);
+    border-radius: var(--ai-radius-md);
+}
+
+/* Button Variants */
+.ai-btn--primary {
+    background: linear-gradient(135deg, var(--ai-color-primary) 0%, var(--ai-color-primary-dark) 100%);
+    color: var(--ai-color-white);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.ai-btn--primary:hover:not(.ai-btn--disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+
+.ai-btn--secondary {
+    background: var(--ai-color-white);
+    color: var(--ai-color-gray-700);
+    border: 1px solid var(--ai-color-gray-200);
+}
+
+.ai-btn--secondary:hover:not(.ai-btn--disabled) {
+    background: var(--ai-color-gray-50);
+    border-color: var(--ai-color-gray-300);
+}
+
+.ai-btn--ghost {
+    background: transparent;
+    color: var(--ai-color-gray-600);
+}
+
+.ai-btn--ghost:hover:not(.ai-btn--disabled) {
+    background: var(--ai-color-gray-100);
+    color: var(--ai-color-gray-800);
+}
+
+.ai-btn--icon {
+    background: transparent;
+    color: var(--ai-color-gray-500);
+    padding: var(--ai-spacing-sm);
+    border-radius: var(--ai-radius-full);
+}
+
+.ai-btn--icon:hover:not(.ai-btn--disabled) {
+    background: var(--ai-color-primary-50);
+    color: var(--ai-color-primary);
+}
+
+/* Button States */
+.ai-btn--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ai-btn--pressed {
+    transform: scale(0.97);
+}
+
+.ai-btn__icon {
+    font-size: 1em;
+}
+
+.ai-btn__spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   AI ICON - Atomic Component
+   ============================================ */
+.ai-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-icon--primary {
+    color: var(--ai-color-primary);
+}
+
+.ai-icon--success {
+    color: var(--ai-color-success);
+}
+
+.ai-icon--warning {
+    color: var(--ai-color-warning);
+}
+
+.ai-icon--danger {
+    color: var(--ai-color-danger);
+}
+
+.ai-icon--muted {
+    color: var(--ai-color-gray-400);
+}
+
+/* ============================================
+   AI BADGE - Atomic Component
+   ============================================ */
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ai-spacing-xs);
+    font-family: var(--ai-font-family);
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* Badge Sizes */
+.ai-badge--sm {
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.ai-badge--md {
+    padding: 4px 10px;
+    font-size: 11px;
+}
+
+/* Badge Variants */
+.ai-badge--primary {
+    background: var(--ai-color-primary);
+    color: var(--ai-color-white);
+}
+
+.ai-badge--success {
+    background: var(--ai-color-success);
+    color: var(--ai-color-white);
+}
+
+.ai-badge--warning {
+    background: var(--ai-color-warning);
+    color: var(--ai-color-white);
+}
+
+.ai-badge--danger {
+    background: var(--ai-color-danger);
+    color: var(--ai-color-white);
+}
+
+.ai-badge--info {
+    background: var(--ai-color-info);
+    color: var(--ai-color-white);
+}
+
+.ai-badge--pill {
+    border-radius: var(--ai-radius-full);
+}
+
+/* ============================================
+   AI SPINNER - Atomic Component
+   ============================================ */
+.ai-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ai-spinner__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: ai-spinner-bounce 1.4s infinite ease-in-out both;
+}
+
+/* Spinner Sizes */
+.ai-spinner--sm .ai-spinner__dot {
+    width: 6px;
+    height: 6px;
+}
+
+.ai-spinner--lg .ai-spinner__dot {
+    width: 12px;
+    height: 12px;
+}
+
+/* Spinner Colors */
+.ai-spinner--primary .ai-spinner__dot {
+    background: var(--ai-color-primary);
+}
+
+.ai-spinner--white .ai-spinner__dot {
+    background: var(--ai-color-white);
+}
+
+.ai-spinner--muted .ai-spinner__dot {
+    background: var(--ai-color-gray-400);
+}
+
+@keyframes ai-spinner-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   AI INPUT - Atomic Component
+   ============================================ */
+.ai-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ai-spacing-xs);
+    position: relative;
+    width: 100%;
+}
+
+.ai-input__field {
+    width: 100%;
+    padding: var(--ai-spacing-sm) var(--ai-spacing-md);
+    font-family: var(--ai-font-family);
+    font-size: var(--ai-font-size-sm);
+    color: var(--ai-color-gray-800);
+    background: var(--ai-color-white);
+    border: 1px solid var(--ai-color-gray-200);
+    border-radius: var(--ai-radius-md);
+    transition: all var(--ai-transition-fast);
+    outline: none;
+}
+
+.ai-input__field::placeholder {
+    color: var(--ai-color-gray-400);
+}
+
+.ai-input__field:hover:not(:disabled) {
+    border-color: var(--ai-color-gray-300);
+}
+
+.ai-input__field--focused {
+    border-color: var(--ai-color-primary);
+    box-shadow: 0 0 0 3px var(--ai-color-primary-50);
+}
+
+.ai-input__field--error {
+    border-color: var(--ai-color-danger);
+}
+
+.ai-input__field--disabled {
+    background: var(--ai-color-gray-50);
+    color: var(--ai-color-gray-400);
+    cursor: not-allowed;
+}
+
+.ai-input__field--has-icon {
+    padding-left: calc(var(--ai-spacing-md) + 20px);
+}
+
+.ai-input__icon {
+    position: absolute;
+    left: var(--ai-spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ai-color-gray-400);
+    pointer-events: none;
+}
+
+/* Textarea specific */
+.ai-input--textarea .ai-input__field {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.ai-input--textarea .ai-input__icon {
+    top: var(--ai-spacing-sm);
+    transform: none;
+}
+
+/* Input error and count */
+.ai-input__error {
+    display: flex;
+    align-items: center;
+    gap: var(--ai-spacing-xs);
+    color: var(--ai-color-danger);
+    font-size: var(--ai-font-size-xs);
+}
+
+.ai-input__count {
+    font-size: var(--ai-font-size-xs);
+    color: var(--ai-color-gray-400);
+    text-align: right;
+}
+
+/* ============================================
+   AI AVATAR - Atomic Component
+   ============================================ */
+.ai-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ai-radius-full);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Avatar Sizes */
+.ai-avatar--xs {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+}
+
+.ai-avatar--sm {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+}
+
+.ai-avatar--md {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+.ai-avatar--lg {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+}
+
+.ai-avatar--xl {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+}
+
+/* Avatar Variants */
+.ai-avatar--user {
+    background: var(--ai-color-gray-100);
+}
+
+.ai-avatar--assistant {
+    background: linear-gradient(135deg, var(--ai-color-primary) 0%, var(--ai-color-primary-dark) 100%);
+}
+
+.ai-avatar--system {
+    background: var(--ai-color-gray-600);
+}
+
+.ai-avatar__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ai-avatar__initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--ai-color-white);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+.o_dark {
+    --ai-color-white: #1e293b;
+    --ai-color-gray-50: #0f172a;
+    --ai-color-gray-100: #1e293b;
+    --ai-color-gray-200: #334155;
+    --ai-color-gray-300: #475569;
+    --ai-color-gray-400: #64748b;
+    --ai-color-gray-500: #94a3b8;
+    --ai-color-gray-600: #cbd5e1;
+    --ai-color-gray-700: #e2e8f0;
+    --ai-color-gray-800: #f1f5f9;
+    --ai-color-gray-900: #f8fafc;
+}
+
+.o_dark .ai-input__field {
+    background: var(--ai-color-gray-100);
+    border-color: var(--ai-color-gray-200);
+    color: var(--ai-color-gray-800);
+}
+
+.o_dark .ai-btn--secondary {
+    background: var(--ai-color-gray-100);
+    border-color: var(--ai-color-gray-200);
+    color: var(--ai-color-gray-700);
+}

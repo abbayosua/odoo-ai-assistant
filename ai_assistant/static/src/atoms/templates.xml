@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Atoms Templates - Atomic Design Layer 1
+  Smallest UI components for the AI Assistant
+-->
+<templates xml:space="preserve">
+
+    <!-- ============================================
+         AI BUTTON - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomButton" owl="1">
+        <button 
+            t-att-class="buttonClass"
+            t-att-disabled="props.disabled or props.loading"
+            t-on-click="handleClick"
+            t-on-mousedown="handleMouseDown"
+            t-on-mouseup="handleMouseUp"
+            t-on-mouseleave="handleMouseUp">
+            
+            <!-- Loading spinner -->
+            <span t-if="props.loading" class="ai-btn__spinner">
+                <i class="fa fa-spinner fa-spin"/>
+            </span>
+            
+            <!-- Icon -->
+            <i t-if="props.icon and not props.loading" 
+               t-attf-class="fa fa-{{props.icon}} ai-btn__icon"/>
+            
+            <!-- Content / Slot -->
+            <span class="ai-btn__content">
+                <t t-esc="props.slots?.default?.()"/>
+                <t t-if="!props.slots?.default">
+                    <t t-out="props.text"/>
+                </t>
+            </span>
+        </button>
+    </t>
+
+    <!-- ============================================
+         AI ICON - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomIcon" owl="1">
+        <i t-att-class="iconClass" aria-hidden="true"/>
+    </t>
+
+    <!-- ============================================
+         AI BADGE - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomBadge" owl="1">
+        <span t-att-class="badgeClass">
+            <i t-if="props.icon" t-attf-class="fa fa-{{props.icon}} ai-badge__icon"/>
+            <span class="ai-badge__content">
+                <t t-esc="props.slots?.default?.()"/>
+            </span>
+        </span>
+    </t>
+
+    <!-- ============================================
+         AI SPINNER - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomSpinner" owl="1">
+        <div t-att-class="spinnerClass" role="status" aria-label="Loading">
+            <div class="ai-spinner__dot"></div>
+            <div class="ai-spinner__dot"></div>
+            <div class="ai-spinner__dot"></div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         AI INPUT - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomInput" owl="1">
+        <div t-att-class="wrapperClass">
+            <!-- Leading icon -->
+            <i t-if="props.icon" 
+               t-attf-class="fa fa-{{props.icon}} ai-input__icon"/>
+            
+            <!-- Text input -->
+            <input 
+                t-if="props.type !== 'textarea'"
+                t-ref="input"
+                type="text"
+                t-att-type="props.type"
+                t-att-placeholder="props.placeholder"
+                t-att-disabled="props.disabled"
+                t-att-maxlength="props.maxLength"
+                t-att-value="state.internalValue"
+                t-att-class="inputClass"
+                t-on-input="handleInput"
+                t-on-change="handleChange"
+                t-on-keydown="handleKeyDown"
+                t-on-focus="handleFocus"
+                t-on-blur="handleBlur"
+            />
+            
+            <!-- Textarea -->
+            <textarea
+                t-if="props.type === 'textarea'"
+                t-ref="input"
+                t-att-placeholder="props.placeholder"
+                t-att-disabled="props.disabled"
+                t-att-maxlength="props.maxLength"
+                t-att-rows="props.rows"
+                t-att-class="inputClass"
+                t-on-input="handleInput"
+                t-on-change="handleChange"
+                t-on-keydown="handleKeyDown"
+                t-on-focus="handleFocus"
+                t-on-blur="handleBlur"
+            ><t t-esc="state.internalValue"/></textarea>
+            
+            <!-- Error message -->
+            <span t-if="props.error" class="ai-input__error">
+                <i class="fa fa-exclamation-circle"/>
+                <t t-esc="props.error"/>
+            </span>
+            
+            <!-- Character count -->
+            <span t-if="props.maxLength" class="ai-input__count">
+                <t t-esc="state.internalValue?.length || 0"/> / <t t-esc="props.maxLength"/>
+            </span>
+        </div>
+    </t>
+
+    <!-- ============================================
+         AI AVATAR - Atomic Component
+         ============================================ -->
+    <t t-name="ai_assistant.AtomAvatar" owl="1">
+        <div t-att-class="avatarClass" t-att-title="props.name">
+            <!-- Image avatar -->
+            <img 
+                t-if="props.src"
+                t-att-src="props.src"
+                t-att-alt="props.name || 'Avatar'"
+                class="ai-avatar__image"
+            />
+            
+            <!-- Initials fallback -->
+            <span 
+                t-if="!props.src" 
+                class="ai-avatar__initials"
+                t-att-style="'background-color: ' + backgroundColor">
+                <t t-esc="initials"/>
+            </span>
+        </div>
+    </t>
+
+</templates>
