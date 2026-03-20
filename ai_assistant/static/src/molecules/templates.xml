@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Molecules Templates - Atomic Design Layer 2
+  Combinations of atoms working together
+-->
+<templates xml:space="preserve">
+
+    <!-- ============================================
+         CHAT MESSAGE - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeChatMessage" owl="1">
+        <div 
+            t-att-class="messageClass"
+            t-on-mouseenter="showActions"
+            t-on-mouseleave="hideActions">
+            
+            <!-- Avatar -->
+            <div t-if="props.showAvatar" class="ai-chat-message__avatar">
+                <AIAvatar 
+                    name="avatarName"
+                    variant="avatarVariant"
+                    size="sm"/>
+            </div>
+            
+            <!-- Content -->
+            <div class="ai-chat-message__content">
+                <!-- Role badge -->
+                <div class="ai-chat-message__header">
+                    <AIBadge variant="isAssistant ? 'primary' : 'secondary'" size="sm">
+                        <t t-esc="isUser ? 'You' : 'AI'"/>
+                    </AIBadge>
+                    <span t-if="props.showTimestamp" class="ai-chat-message__time">
+                        <t t-esc="formattedTime"/>
+                    </span>
+                </div>
+                
+                <!-- Message body -->
+                <div class="ai-chat-message__body" t-out="renderedContent"/>
+                
+                <!-- Actions (for assistant messages) -->
+                <div t-if="isAssistant and state.showActions" class="ai-chat-message__actions">
+                    <button 
+                        class="ai-chat-message__action"
+                        t-on-click="handleCopy"
+                        title="Copy to clipboard">
+                        <AIIcon name="state.copied ? 'check' : 'copy'" size="sm"/>
+                    </button>
+                    <button 
+                        t-if="props.onRegenerate"
+                        class="ai-chat-message__action"
+                        t-on-click="handleRegenerate"
+                        title="Regenerate">
+                        <AIIcon name="sync" size="sm"/>
+                    </button>
+                    <button 
+                        t-if="props.onFeedback"
+                        class="ai-chat-message__action"
+                        t-on-click="handleFeedback('positive')"
+                        title="Good response">
+                        <AIIcon name="thumbs-up" size="sm"/>
+                    </button>
+                    <button 
+                        t-if="props.onFeedback"
+                        class="ai-chat-message__action"
+                        t-on-click="handleFeedback('negative')"
+                        title="Bad response">
+                        <AIIcon name="thumbs-down" size="sm"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         CHAT INPUT - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeChatInput" owl="1">
+        <div class="ai-chat-input">
+            <!-- Attach button -->
+            <button 
+                t-if="props.showAttach"
+                class="ai-chat-input__attach"
+                t-on-click="handleAttach"
+                title="Attach file">
+                <AIIcon name="paperclip" size="md"/>
+            </button>
+            
+            <!-- Text input -->
+            <div class="ai-chat-input__field-wrapper">
+                <textarea
+                    t-ref="input"
+                    class="ai-chat-input__field"
+                    t-att-placeholder="props.placeholder"
+                    t-att-disabled="props.disabled"
+                    t-att-maxlength="props.maxLength"
+                    t-on-input="(ev) => state.value = ev.target.value"
+                    t-on-keydown="handleKeyDown"
+                    rows="1"/>
+                
+                <!-- Character count -->
+                <span 
+                    t-if="props.maxLength and isNearLimit"
+                    class="ai-chat-input__count"
+                    t-att-class="{ 'ai-chat-input__count--warning': characterCount >= props.maxLength }">
+                    <t t-esc="characterCount"/> / <t t-esc="props.maxLength"/>
+                </span>
+            </div>
+            
+            <!-- Voice button -->
+            <button 
+                t-if="props.showVoice"
+                class="ai-chat-input__voice"
+                t-on-click="handleVoice"
+                title="Voice input">
+                <AIIcon name="microphone" size="md"/>
+            </button>
+            
+            <!-- Send button -->
+            <button
+                class="ai-chat-input__send"
+                t-att-disabled="!canSend"
+                t-on-click="handleSend">
+                <AIIcon name="props.loading ? 'spinner' : 'paper-plane'" size="md" spin="props.loading"/>
+            </button>
+        </div>
+    </t>
+
+    <!-- ============================================
+         SUGGESTION ITEM - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeSuggestionItem" owl="1">
+        <div 
+            t-att-class="itemClass"
+            t-on-click="handleClick"
+            role="option"
+            t-att-aria-selected="props.selected">
+            
+            <!-- Icon -->
+            <AIIcon 
+                t-if="props.suggestion.icon"
+                name="props.suggestion.icon"
+                size="sm"
+                class="ai-suggestion-item__icon"/>
+            
+            <!-- Content -->
+            <div class="ai-suggestion-item__content">
+                <span class="ai-suggestion-item__text">
+                    <t t-esc="props.suggestion.text"/>
+                </span>
+                <span t-if="props.suggestion.description" class="ai-suggestion-item__description">
+                    <t t-esc="props.suggestion.description"/>
+                </span>
+            </div>
+            
+            <!-- AI Badge -->
+            <AIBadge variant="primary" size="sm">AI</AIBadge>
+        </div>
+    </t>
+
+    <!-- ============================================
+         TYPING INDICATOR - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeTypingIndicator" owl="1">
+        <div class="ai-typing-indicator">
+            <AIAvatar name="AI" variant="assistant" size="sm"/>
+            <div class="ai-typing-indicator__content">
+                <AISpinner size="sm"/>
+                <span class="ai-typing-indicator__text">
+                    <t t-esc="props.text"/>
+                </span>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         CONVERSATION HEADER - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeConversationHeader" owl="1">
+        <div class="ai-conversation-header">
+            <div class="ai-conversation-header__left">
+                <div class="ai-conversation-header__icon">
+                    <AIIcon name="robot" size="lg" color="primary"/>
+                </div>
+                <div class="ai-conversation-header__info">
+                    <h3 class="ai-conversation-header__title">
+                        <t t-esc="props.title"/>
+                    </h3>
+                    <span t-if="props.subtitle" class="ai-conversation-header__subtitle">
+                        <t t-esc="props.subtitle"/>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="ai-conversation-header__actions">
+                <button 
+                    t-if="props.showClear"
+                    class="ai-conversation-header__action"
+                    t-on-click="handleClear"
+                    title="Clear conversation">
+                    <AIIcon name="trash" size="sm"/>
+                </button>
+                <button 
+                    t-if="props.showSettings"
+                    class="ai-conversation-header__action"
+                    t-on-click="handleSettings"
+                    title="Settings">
+                    <AIIcon name="cog" size="sm"/>
+                </button>
+                <button 
+                    t-if="props.showClose"
+                    class="ai-conversation-header__action"
+                    t-on-click="handleClose"
+                    title="Close">
+                    <AIIcon name="times" size="sm"/>
+                </button>
+            </div>
+        </div>
+    </t>
+
+    <!-- ============================================
+         EMPTY STATE - Molecule Component
+         ============================================ -->
+    <t t-name="ai_assistant.MoleculeEmptyState" owl="1">
+        <div class="ai-empty-state">
+            <div class="ai-empty-state__icon">
+                <AIIcon name="robot" size="xl" color="primary"/>
+            </div>
+            <h3 class="ai-empty-state__title">
+                <t t-esc="props.title"/>
+            </h3>
+            <p class="ai-empty-state__description">
+                <t t-esc="props.description"/>
+            </p>
+            <div class="ai-empty-state__suggestions">
+                <button 
+                    t-foreach="props.suggestions" 
+                    t-as="suggestion"
+                    t-key="suggestion_index"
+                    class="ai-empty-state__suggestion"
+                    t-on-click="() => handleSuggestionClick(suggestion)">
+                    <AIIcon name="lightbulb" size="sm"/>
+                    <span t-esc="suggestion"/>
+                </button>
+            </div>
+        </div>
+    </t>
+
+</templates>
