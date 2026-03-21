@@ -25,13 +25,9 @@ class AIAssistantController(http.Controller):
         if conversation_id:
             conversation = request.env['ai.assistant.conversation'].browse(conversation_id)
             if not conversation.exists() or conversation.user_id != request.env.user:
-                conversation = request.env['ai.assistant.conversation'].create({
-                    'user_id': request.env.user.id,
-                })
+                conversation = request.env['ai.assistant.conversation'].create_conversation()
         else:
-            conversation = request.env['ai.assistant.conversation'].create({
-                'user_id': request.env.user.id,
-            })
+            conversation = request.env['ai.assistant.conversation'].create_conversation()
         
         # Update context if provided
         if context:
@@ -52,28 +48,7 @@ class AIAssistantController(http.Controller):
     @http.route('/ai/chat/history', type='json', auth='user', methods=['POST'])
     def chat_history(self, conversation_id=None, limit=20):
         """Get conversation history"""
-        domain = [('user_id', '=', request.env.user.id)]
-        
-        if conversation_id:
-            domain.append(('id', '=', conversation_id))
-        
-        conversations = request.env['ai.assistant.conversation'].search(
-            domain,
-            limit=limit,
-            order='create_date desc'
-        )
-        
-        return [{
-            'id': conv.id,
-            'title': conv.title,
-            'create_date': conv.create_date.isoformat() if conv.create_date else None,
-            'messages': [{
-                'id': msg.id,
-                'role': msg.role,
-                'content': msg.content,
-                'create_date': msg.create_date.isoformat() if msg.create_date else None,
-            } for msg in conv.message_ids],
-        } for conv in conversations]
+        return request.env['ai.assistant.conversation'].get_history(conversation_id, limit)
     
     @http.route('/ai/autocomplete', type='json', auth='user', methods=['POST'])
     def autocomplete(self, text, model=None, field=None, context=None):

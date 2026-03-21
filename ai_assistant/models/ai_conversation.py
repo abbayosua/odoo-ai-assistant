@@ -81,6 +81,60 @@ class AIConversation(models.Model):
         for conversation in self:
             conversation.message_count = len(conversation.message_ids)
     
+    @api.model
+    def get_history(self, conversation_id=None, limit=20):
+        """Get conversation history for the current user"""
+        domain = [('user_id', '=', self.env.user.id), ('is_archived', '=', False)]
+        
+        if conversation_id:
+            domain.append(('id', '=', conversation_id))
+        
+        conversations = self.search(domain, limit=limit, order='create_date desc')
+        
+        return [{
+            'id': conv.id,
+            'title': conv.title,
+            'create_date': conv.create_date.isoformat() if conv.create_date else None,
+            'context_model': conv.context_model,
+            'context_res_id': conv.context_res_id,
+            'message_count': conv.message_count,
+            'messages': [{
+                'id': msg.id,
+                'role': msg.role,
+                'content': msg.content,
+                'create_date': msg.create_date.isoformat() if msg.create_date else None,
+            } for msg in conv.message_ids],
+        } for conv in conversations]
+    
+    @api.model
+    def create_conversation(self, context_model=None, context_res_id=None, provider_id=None):
+        """Create a new conversation"""
+        values = {
+            'user_id': self.env.user.id,
+        }
+        if context_model:
+            values['context_model'] = context_model
+        if context_res_id:
+            values['context_res_id'] = context_res_id
+        if provider_id:
+            values['provider_id'] = provider_id
+        
+        return self.create(values)
+    
+    @api.model
+    def get_or_create_for_context(self, model, res_id):
+        """Get or create a conversation for a specific context"""
+        domain = [
+            ('user_id', '=', self.env.user.id),
+            ('context_model', '=', model),
+            ('context_res_id', '=', res_id),
+            ('is_archived', '=', False),
+        ]
+        conversation = self.search(domain, limit=1)
+        if not conversation:
+            conversation = self.create_conversation(model, res_id)
+        return conversation
+    
     def action_archive(self):
         """Archive a conversation"""
         self.write({'is_archived': True})
@@ -115,20 +169,22 @@ class AIConversation(models.Model):
             'system_prompt': self._build_system_prompt(),
         }
         
-        # Get conversation history
-        history = self.message_ids.filtered(lambda m: m.role in ['user', 'assistant'])
-        history_text = '\n'.join([
-            f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
-            for m in history[:-1]  # Exclude the message we just created
-        ])
-        
-        # Generate response
-        prompt = content
-        if history_text:
-            prompt = f"Previous conversation:\n{history_text}\n\nCurrent message: {content}"
+        # Get conversation history for context
+        history_messages = []
+        previous_messages = self.message_ids.filtered(lambda m: m.role in ['user', 'assistant'])
+        for msg in previous_messages:
+            history_messages.append({
+                'role': msg.role,
+                'content': msg.content,
+            })
         
         try:
-            response = provider.generate_response(prompt, ai_context)
+            # Use history-aware generation if available
+            if len(history_messages) > 1 and hasattr(provider, 'generate_response_with_history'):
+                response = provider.generate_response_with_history(history_messages, ai_context)
+            else:
+                # Fallback to simple generation
+                response = provider.generate_response(content, ai_context)
             
             # Create assistant message
             assistant_message = self.env['ai.assistant.message'].create({

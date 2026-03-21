@@ -124,6 +124,8 @@ class AIProvider(models.Model):
                 result = self._test_ollama_connection()
             elif self.provider_type == 'anthropic':
                 result = self._test_anthropic_connection()
+            elif self.provider_type == 'google':
+                result = self._test_gemini_connection()
             else:
                 result = {'success': False, 'message': 'Provider not implemented yet'}
             
@@ -193,6 +195,37 @@ class AIProvider(models.Model):
         except Exception as e:
             return {'success': False, 'message': str(e)}
     
+    def _test_gemini_connection(self) -> Dict[str, Any]:
+        """Test Google Gemini API connection"""
+        try:
+            base_url = self.base_url or 'https://generativelanguage.googleapis.com/v1beta'
+            model = self.model or 'gemini-2.5-flash-lite'
+            
+            # Simple test request
+            response = requests.post(
+                f'{base_url}/models/{model}:generateContent',
+                headers={
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': self.api_key,
+                },
+                json={
+                    'contents': [{'parts': [{'text': 'Hi'}]}]
+                },
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                return {
+                    'success': True,
+                    'message': _('Successfully connected to Google Gemini (%s).') % model
+                }
+            return {
+                'success': False, 
+                'message': _('Gemini API error: %s') % response.text[:200]
+            }
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+    
     def get_default_provider(self):
         """Get the default AI provider"""
         provider = self.search([('is_default', '=', True), ('active', '=', True)], limit=1)
@@ -210,6 +243,8 @@ class AIProvider(models.Model):
             return self._generate_ollama(prompt, context)
         elif self.provider_type == 'anthropic':
             return self._generate_anthropic(prompt, context)
+        elif self.provider_type == 'google':
+            return self._generate_gemini(prompt, context)
         else:
             raise exceptions.UserError(_('Provider %s not implemented yet') % self.provider_type)
     
@@ -276,6 +311,168 @@ class AIProvider(models.Model):
         )
         
         return message.content[0].text
+    
+    def _generate_gemini(self, prompt: str, context: Optional[Dict] = None) -> str:
+        """Generate response using Google Gemini API"""
+        base_url = self.base_url or 'https://generativelanguage.googleapis.com/v1beta'
+        model = self.model or 'gemini-2.5-flash-lite'
+        
+        # Build contents array
+        contents = []
+        
+        # Add system instruction if provided
+        system_instruction = None
+        if context and context.get('system_prompt'):
+            system_instruction = {'parts': [{'text': context['system_prompt']}]}
+        
+        # Add user message
+        contents.append({
+            'role': 'user',
+            'parts': [{'text': prompt}]
+        })
+        
+        payload = {
+            'contents': contents,
+            'generationConfig': {
+                'temperature': self.temperature,
+                'maxOutputTokens': self.max_tokens,
+            }
+        }
+        
+        if system_instruction:
+            payload['system_instruction'] = system_instruction
+        
+        try:
+            response = requests.post(
+                f'{base_url}/models/{model}:generateContent',
+                headers={
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': self.api_key,
+                },
+                json=payload,
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                # Extract text from Gemini response
+                candidates = result.get('candidates', [])
+                if candidates:
+                    parts = candidates[0].get('content', {}).get('parts', [])
+                    if parts:
+                        return parts[0].get('text', '')
+                raise exceptions.UserError(_('Empty response from Gemini'))
+            else:
+                error_msg = response.json().get('error', {}).get('message', response.text)
+                raise exceptions.UserError(_('Gemini API error: %s') % error_msg)
+                
+        except requests.exceptions.Timeout:
+            raise exceptions.UserError(_('Gemini request timed out'))
+        except requests.exceptions.RequestException as e:
+            raise exceptions.UserError(_('Gemini request failed: %s') % str(e))
+    
+    def generate_response_with_history(self, messages: List[Dict], context: Optional[Dict] = None) -> str:
+        """Generate a response with conversation history"""
+        self.ensure_one()
+        
+        if self.provider_type == 'google':
+            return self._generate_gemini_with_history(messages, context)
+        elif self.provider_type == 'openai':
+            return self._generate_openai_with_history(messages, context)
+        elif self.provider_type == 'anthropic':
+            return self._generate_anthropic_with_history(messages, context)
+        elif self.provider_type == 'ollama':
+            return self._generate_ollama_with_history(messages, context)
+        else:
+            # Fallback to simple generate
+            combined_prompt = '\n'.join([f"{m['role']}: {m['content']}" for m in messages])
+            return self.generate_response(combined_prompt, context)
+    
+    def _generate_gemini_with_history(self, messages: List[Dict], context: Optional[Dict] = None) -> str:
+        """Generate response using Gemini with conversation history"""
+        base_url = self.base_url or 'https://generativelanguage.googleapis.com/v1beta'
+        model = self.model or 'gemini-2.5-flash-lite'
+        
+        # Convert messages to Gemini format
+        contents = []
+        for msg in messages:
+            role = 'user' if msg['role'] == 'user' else 'model'
+            contents.append({
+                'role': role,
+                'parts': [{'text': msg['content']}]
+            })
+        
+        payload = {
+            'contents': contents,
+            'generationConfig': {
+                'temperature': self.temperature,
+                'maxOutputTokens': self.max_tokens,
+            }
+        }
+        
+        if context and context.get('system_prompt'):
+            payload['system_instruction'] = {'parts': [{'text': context['system_prompt']}]}
+        
+        response = requests.post(
+            f'{base_url}/models/{model}:generateContent',
+            headers={
+                'Content-Type': 'application/json',
+                'X-goog-api-key': self.api_key,
+            },
+            json=payload,
+            timeout=60
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            candidates = result.get('candidates', [])
+            if candidates:
+                parts = candidates[0].get('content', {}).get('parts', [])
+                if parts:
+                    return parts[0].get('text', '')
+        raise exceptions.UserError(_('Gemini request failed: %s') % response.text)
+    
+    def _generate_openai_with_history(self, messages: List[Dict], context: Optional[Dict] = None) -> str:
+        """Generate response using OpenAI with conversation history"""
+        import openai
+        
+        client = openai.OpenAI(api_key=self.api_key)
+        
+        api_messages = []
+        if context and context.get('system_prompt'):
+            api_messages.append({'role': 'system', 'content': context['system_prompt']})
+        api_messages.extend(messages)
+        
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=api_messages,
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
+        )
+        
+        return response.choices[0].message.content
+    
+    def _generate_anthropic_with_history(self, messages: List[Dict], context: Optional[Dict] = None) -> str:
+        """Generate response using Anthropic with conversation history"""
+        import anthropic
+        
+        client = anthropic.Anthropic(api_key=self.api_key)
+        system_prompt = context.get('system_prompt', '') if context else ''
+        
+        message = client.messages.create(
+            model=self.model,
+            max_tokens=self.max_tokens,
+            system=system_prompt,
+            messages=messages
+        )
+        
+        return message.content[0].text
+    
+    def _generate_ollama_with_history(self, messages: List[Dict], context: Optional[Dict] = None) -> str:
+        """Generate response using Ollama with conversation history"""
+        # Ollama doesn't have native chat API in older versions, combine messages
+        combined = '\n'.join([f"{m['role']}: {m['content']}" for m in messages])
+        return self._generate_ollama(combined, context)
 
 
 class AIConfigSettings(models.TransientModel):
