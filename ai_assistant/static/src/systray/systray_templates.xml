@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Systray Templates for AI Assistant
+  System tray integration
+-->
+<templates xml:space="preserve">
+
+    <!-- ============================================
+         SYSTRAY ITEM - AI Assistant Button
+         ============================================ -->
+    <t t-name="ai_assistant.SystrayItem" owl="1">
+        <div class="ai_systray_wrapper">
+            <!-- Systray Button -->
+            <div class="o_navbar_item o-dropdown dropdown">
+                <button 
+                    class="o_navbar_buttons btn o-no-caret ai-systray-btn"
+                    t-on-click="toggleChat"
+                    title="AI Assistant">
+                    <i class="fa fa-robot me-1"/>
+                    <span class="d-none d-md-inline">AI</span>
+                </button>
+            </div>
+            
+            <!-- Chat Widget Popup -->
+            <ChatWidget 
+                t-if="state.isChatOpen"
+                isOpen="true"
+                position="'bottom-right'"
+                onClose="closeChat"/>
+        </div>
+    </t>
+
+</templates>

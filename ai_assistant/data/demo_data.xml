@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Part of Odoo AI Assistant. See LICENSE file for full copyright and licensing details. -->
 <odoo noupdate="0">
+    <!-- Demo AI Provider (Google Gemini) -->
+    <record id="demo_provider_gemini" model="ai.assistant.provider">
+        <field name="name">Google Gemini</field>
+        <field name="provider_type">google</field>
+        <field name="model">gemini-2.5-flash-lite</field>
+        <field name="temperature">0.7</field>
+        <field name="max_tokens">2000</field>
+        <field name="is_default" eval="True"/>
+        <field name="sequence">1</field>
+    </record>
+    
     <!-- Demo AI Provider (Ollama Local - for testing) -->
     <record id="demo_provider_ollama" model="ai.assistant.provider">
         <field name="name">Demo Ollama (Local)</field>
@@ -9,7 +20,30 @@
         <field name="model">llama3.2</field>
         <field name="temperature">0.7</field>
         <field name="max_tokens">2000</field>
-        <field name="is_default" eval="True"/>
+        <field name="is_default" eval="False"/>
+        <field name="sequence">10</field>
+    </record>
+    
+    <!-- Demo AI Provider (OpenAI) -->
+    <record id="demo_provider_openai" model="ai.assistant.provider">
+        <field name="name">OpenAI</field>
+        <field name="provider_type">openai</field>
+        <field name="model">gpt-4o-mini</field>
+        <field name="temperature">0.7</field>
+        <field name="max_tokens">2000</field>
+        <field name="is_default" eval="False"/>
+        <field name="sequence">2</field>
+    </record>
+    
+    <!-- Demo AI Provider (Anthropic) -->
+    <record id="demo_provider_anthropic" model="ai.assistant.provider">
+        <field name="name">Anthropic Claude</field>
+        <field name="provider_type">anthropic</field>
+        <field name="model">claude-3-haiku-20240307</field>
+        <field name="temperature">0.7</field>
+        <field name="max_tokens">2000</field>
+        <field name="is_default" eval="False"/>
+        <field name="sequence">3</field>
     </record>
     
     <!-- Demo Conversation -->

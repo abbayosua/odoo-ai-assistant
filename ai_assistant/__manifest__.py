@@ -115,6 +115,10 @@ Supported Odoo Versions: 16, 17, 18, 19
             # Main entry point
             'ai_assistant/static/src/main.js',
             
+            # Systray integration
+            'ai_assistant/static/src/systray/ai_systray.js',
+            'ai_assistant/static/src/systray/systray_templates.xml',
+            
             # Legacy CSS (for backward compatibility)
             'ai_assistant/static/src/css/ai_assistant.css',
         ],

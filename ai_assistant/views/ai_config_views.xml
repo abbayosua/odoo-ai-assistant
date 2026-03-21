@@ -46,7 +46,7 @@
                         </group>
                         <group string="API Configuration">
                             <field name="api_key" password="True" attrs="{'invisible': [('provider_type', '=', 'ollama')]}"/>
-                            <field name="base_url" attrs="{'invisible': [('provider_type', '!=', 'ollama')]}" placeholder="http://localhost:11434"/>
+                            <field name="base_url" attrs="{'invisible': [('provider_type', 'not in', ('ollama', 'google', 'custom'))]}" placeholder="http://localhost:11434 for Ollama or leave default"/>
                         </group>
                     </group>
                     <group string="Generation Settings">
@@ -76,7 +76,7 @@
                 Add your first AI provider
             </p>
             <p>
-                Configure AI providers like OpenAI, Ollama (local), or Anthropic Claude
+                Configure AI providers like OpenAI, Google Gemini, Ollama (local), or Anthropic Claude
                 to enable AI-powered features in Odoo.
             </p>
         </field>
